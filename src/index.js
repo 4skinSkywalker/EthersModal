@@ -123,10 +123,9 @@ EthersModal.prototype.disconnect = function () {
   this.connection.selectedAccount$.next(null);
   this.connection.baseTokenBalance$.next(null);
 
-  clearInterval(this.networkChangedInterval);
-  clearInterval(this.accountsChangedInterval);
+  this.networkChangedInterval.stop();
+  this.accountsChangedInterval.stop();
   this.baseTokenBalanceChangedInterval.stop();
-  this.baseTokenBalanceChangedInterval = null;
 
   this.clearCachedProvider();
 };
@@ -203,25 +202,21 @@ EthersModal.prototype.syncingIntervals = async function (getNetwork, getAccounts
 
   // Handles changes in network
   if (!this.networkChangedInterval) {
-    this.networkChangedInterval = setInterval(
-      () => updateChainId(),
-      this.syncRate
-    );
+    this.networkChangedInterval = new SmartInterval(updateChainId, this.syncRate);
   }
+  this.networkChangedInterval.start();
 
   // Handles changes in accounts
   if (!this.accountsChangedInterval) {
-    this.accountsChangedInterval = setInterval(
-      () => updateSelectedAccount(),
-      this.syncRate
-    );
+    this.accountsChangedInterval = new SmartInterval(updateSelectedAccount, this.syncRate);
   }
+  this.accountsChangedInterval.start();
 
   // Handles changes in base token balance
   if (!this.baseTokenBalanceChangedInterval) {
     this.baseTokenBalanceChangedInterval = new SmartInterval(updateBaseTokenBalance, this.syncRate);
-    this.baseTokenBalanceChangedInterval.start();
   }
+  this.baseTokenBalanceChangedInterval.start();
 };
 
 EthersModal.prototype.fade = function (zeroOrOne) {
