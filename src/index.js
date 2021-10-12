@@ -1,8 +1,13 @@
 let { ethers } = require("ethers");
 let { ObsCacher } = require("bada55asyncutils");
 let providers = require("./providers");
+let SmartInterval = require("smartinterval");
 
 let LS_KEY = "ETHERS_MODAL_CACHED_PROVIDER";
+
+let isNotNullOrUndefined = (value) => {
+  return ![null, undefined].includes(value);
+}
 
 function EthersModal(opts = {}) {
 
@@ -11,23 +16,47 @@ function EthersModal(opts = {}) {
     provider$: new ObsCacher(),
     signer$: new ObsCacher(),
     chainId$: new ObsCacher(),
-    selectedAccount$: new ObsCacher()
+    selectedAccount$: new ObsCacher(),
+    baseTokenBalance$: new ObsCacher(),
+    isConnected$: new ObsCacher(false)
   };
+
+  this.providerOpts = opts.providerOpts || providers.array;
+  this.cacheProvider = opts.cacheProvider || false;
+
+  this.syncRate = opts.refreshRate || "1000";
+
+  this.width = opts.width || "90vw";
+  this.maxWidth = opts.maxWidth || "480px";
+
+  // Make isConnected subordinate to the existence of all other fields
+  let obsToMonitor = [
+    this.connection.provider$,
+    this.connection.signer$,
+    this.connection.chainId$,
+    this.connection.selectedAccount$,
+    this.connection.baseTokenBalance$
+  ];
+  obsToMonitor.forEach(obs =>
+    obs.subscribe(() => {
+      let isConnected = obsToMonitor.every(obs =>
+        isNotNullOrUndefined(obs.getValue())
+      );
+      if (this.connection.isConnected$.getValue() !== isConnected) {
+        this.connection.isConnected$.next(isConnected);
+      }
+    })
+  );
 
   this.networkChangedInterval;
   this.accountsChangedInterval;
+  this.baseTokenBalanceChangedInterval;
 
   // Everything is "encapsulate" by this UUID
   this.uuid = Math.random().toString(36).slice(2);
 
   // Append this instance to the window object
   window["EthersModal" + this.uuid] = this;
-
-  this.providerOpts = opts.providerOpts || providers;
-  this.cacheProvider = opts.cacheProvider || false;
-
-  this.width = opts.width || "90vw";
-  this.maxWidth = opts.maxWidth || "480px";
 
   if (
     this.providerOpts.some(opt =>
@@ -92,8 +121,13 @@ EthersModal.prototype.disconnect = function () {
   this.connection.signer$.next(null);
   this.connection.chainId$.next(null);
   this.connection.selectedAccount$.next(null);
+  this.connection.baseTokenBalance$.next(null);
+
   clearInterval(this.networkChangedInterval);
   clearInterval(this.accountsChangedInterval);
+  this.baseTokenBalanceChangedInterval.stop();
+  this.baseTokenBalanceChangedInterval = null;
+
   this.clearCachedProvider();
 };
 
@@ -113,11 +147,11 @@ EthersModal.prototype.onWalletClick = async function (providerOptIndex) {
       providerOpt.options
     );
 
-  // Sync variables
-  await this.syncingIntervals(getNetwork, getAccounts);
-
   this.connection.provider$.next(provider);
   this.connection.signer$.next(signer);
+
+  // Sync variables
+  await this.syncingIntervals(getNetwork, getAccounts);
 
   // Cache the current provider
   if (this.cacheProvider) {
@@ -129,7 +163,6 @@ EthersModal.prototype.onWalletClick = async function (providerOptIndex) {
   this.resolve(this.connection);
   this.fade(0);
 };
-
 
 EthersModal.prototype.syncingIntervals = async function (getNetwork, getAccounts) {
 
@@ -156,14 +189,38 @@ EthersModal.prototype.syncingIntervals = async function (getNetwork, getAccounts
   };
   await updateSelectedAccount();
 
+  let updateBaseTokenBalance = async () => {
+    let signer = this.connection.signer$.getValue();
+    if (isNotNullOrUndefined(signer)) {
+      let balance = await signer.getBalance();
+      let ether = ethers.utils.formatEther(balance);
+      if (this.connection.baseTokenBalance$.getValue() !== ether) {
+        this.connection.baseTokenBalance$.next(ether);
+      }
+    }
+  };
+  await updateBaseTokenBalance();
+
   // Handles changes in network
   if (!this.networkChangedInterval) {
-    this.networkChangedInterval = setInterval(() => updateChainId(), 1000);
+    this.networkChangedInterval = setInterval(
+      () => updateChainId(),
+      this.syncRate
+    );
   }
 
   // Handles changes in accounts
   if (!this.accountsChangedInterval) {
-    this.accountsChangedInterval = setInterval(() => updateSelectedAccount(), 1000);
+    this.accountsChangedInterval = setInterval(
+      () => updateSelectedAccount(),
+      this.syncRate
+    );
+  }
+
+  // Handles changes in base token balance
+  if (!this.baseTokenBalanceChangedInterval) {
+    this.baseTokenBalanceChangedInterval = new SmartInterval(updateBaseTokenBalance, this.syncRate);
+    this.baseTokenBalanceChangedInterval.start();
   }
 };
 

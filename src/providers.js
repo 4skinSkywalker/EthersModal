@@ -47,7 +47,7 @@ let MetaMaskCfg = {
         let signer = ethersProvider.getSigner();
 
         return {
-            provider,
+            provider: ethersProvider,
             signer,
             getNetwork: ethersProvider.getNetwork.bind(ethersProvider),
             getAccounts: ethersProvider.listAccounts.bind(ethersProvider)
@@ -257,7 +257,7 @@ let WalletConnectCfg = {
         let signer = ethersProvider.getSigner();
 
         return {
-            provider,
+            provider: ethersProvider,
             signer,
             getNetwork: ethersProvider.getNetwork.bind(ethersProvider),
             getAccounts: ethersProvider.listAccounts.bind(ethersProvider)

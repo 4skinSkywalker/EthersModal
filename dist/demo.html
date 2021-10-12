@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        :root {
+            --text-dark-color: #111;
+            --text-light-color: #fffff1;
+            --figure-color: #eee;
+            --ground-color: #333;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            color: var(--text-light-color);
+            background-color: var(--ground-color);
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1rem;
+            height: 64px;
+            color: var(--text-dark-color);
+            background-color: var(--figure-color);
+            box-shadow: 0 12px 24px #000a;
+        }
+        .connection {
+            display: grid;
+            grid-gap: 2rem;
+            grid-template-columns: max-content max-content;
+            align-content: center;
+            justify-content: center;
+            padding-top: 2rem;
+            height: calc(100vh - 64px);
+            overflow: auto;
+        }
+        .connect {
+            padding: .5rem 1rem;
+            border: 0;
+            border-radius: 1rem;
+            color: var(--text-light-color);
+            background-color: var(--ground-color);
+            box-shadow: 0 4px 8px #0008;
+            cursor: pointer;
+            transition: all .3s ease;
+        }
+        .connect:hover {
+            transform: translateY(-2px) scale(.98);
+            box-shadow: 0 6px 12px #0004;
+        }
+        .divider {
+            display: grid;
+            align-content: flex-start;
+            grid-gap: 1.5rem;
+            width: 90vw;
+            max-width: 320px;
+            padding: 2rem;
+            border-radius: 1rem;
+            background-color: var(--figure-color);
+            box-shadow: 0 12px 24px #000a;
+        }
+        .field {
+            padding: 1rem;
+            border-radius: 1rem;
+            color: var(--text-light-color);
+            background-color: var(--ground-color);
+            box-shadow: 0 8px 16px #0009;
+            word-break: break-word;
+        }
+        .field [class] {
+            margin-top: .5rem;
+            padding: .5rem;
+            border-radius: 1rem;
+            color: var(--text-dark-color);
+            background-color: var(--figure-color);
+            box-shadow: 0 4px 8px #0008;
+        }
+        @media (max-width: 600px) {
+            .connection {
+                grid-template-columns: max-content;
+                align-content: initial;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <div>Your dapp</div>
+        <button class="connect">Connect</button>
+    </div>
+    <div class="connection">
+        <div class="divider">
+            <div class="field">
+                <div>Previous chain id</div>
+                <div class="prev-chain-id">-</div>
+            </div>
+            <div class="field">
+                <div>Previous selected account</div>
+                <div class="prev-selected-account">-</div>
+            </div>
+            <p style="color: var(--text-dark-color);">A field only changes on a <b>specific wallet interaction</b>.</p>
+        </div>
+        <div class="divider">
+            <div class="field">
+                <div>Chain id</div>
+                <div class="chain-id">-</div>
+            </div>
+            <div class="field">
+                <div>Selected account</div>
+                <div class="selected-account">-</div>
+            </div>
+            <div class="field">
+                <div>Base token balance</div>
+                <div class="base-token-balance">-</div>
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+    <script>
+        let connectBtn = document.querySelector(".connect");
+        let prevChainDiv = document.querySelector(".prev-chain-id");
+        let prevAccountDiv = document.querySelector(".prev-selected-account");
+        let chainDiv = document.querySelector(".chain-id");
+        let accountDiv = document.querySelector(".selected-account");
+        let balanceDiv = document.querySelector(".base-token-balance");
+        
+        let em = new EthersModal();
+
+        let disconnect = function () {
+            em.disconnect();
+            connectBtn.innerText = "Connect";
+            connectBtn.removeEventListener("click", disconnect);
+            connectBtn.addEventListener("click", connect);
+        };
+
+        let setupUI = function ({ chainId$, selectedAccount$, baseTokenBalance$ }) {
+            chainId$.subscribe(newChainId => {
+                prevChainDiv.innerText = chainDiv.innerText;
+                chainDiv.innerText = (newChainId) ? newChainId : "-";
+            });
+            selectedAccount$.subscribe(newSelectedAccount => {
+                prevAccountDiv.innerText = accountDiv.innerText;
+                accountDiv.innerText = (newSelectedAccount) ? newSelectedAccount : "-";
+            });
+            baseTokenBalance$.subscribe(newBaseTokenBalance => {
+                balanceDiv.innerText = (newBaseTokenBalance) ? newBaseTokenBalance : "-";
+            });
+        }
+
+        let connect = async function () {
+            let connection = await em.connect();
+
+            setupUI(connection);
+
+            connectBtn.innerText = "Disconnect";
+            connectBtn.removeEventListener("click", connect);
+            connectBtn.addEventListener("click", disconnect);
+        };
+
+        connectBtn.addEventListener("click", connect);
+    </script>
+</body>
+
+</html>

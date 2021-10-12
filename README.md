@@ -16,6 +16,7 @@ When calling the .connect() method you will receive an object with essential pro
 - A signer
 - The chain id
 - The selected account (the first one if multiple are present)
+- Base token balance (in ether)
 
 I choose this approach because it makes way way easier for me to implement stuff.
 Obviously this is not a one-size-fits-all kind of solution, but it covers 99% of the stuff I've done in the past.
@@ -24,12 +25,16 @@ Web3Modal is more flexible, but it doesn't provide all that this library does.
 Another thing that makes this very opinionated is the fact that Provider, Signer, Chain ID and Selected Account that get returned by a connection call are of type ObsCached (see below to know more) which is kind like a variable that you can listen to for changes.
 This is especially useful if you want to react with your code to changes in all four above properties.
 
+## Try it
+
+Head over to [[TODO]] and try with your MetaMask or Binance Chain wallets.
+
 ## Getting started
 
 The easiest example you can try is using the default settings:
 
 ```js
-// Make an instance of EthersModal (by default has just MetaMask and Binance Chain Wallet)
+// Make an instance of EthersModal (by default just MetaMask and Binance Chain Wallet)
 let em = new EthersModal();
 
 (async () => {
@@ -80,6 +85,17 @@ let em = new EthersModal();
 
     // You can stop listening for changes to the selected account
     selectedAccountSubscription.unsubscribe();
+
+
+    // You can get the base token balance (in ether)
+    connection.baseTokenBalance$.getValue();
+
+    // You can listen for changes to the selected account
+    let baseTokenBalanceSubscription = connection.baseTokenBalance$
+        .subscribe(newBaseTokenBalance => { ... });
+
+    // You can stop listening for changes to the selected account
+    baseTokenBalanceSubscription.unsubscribe();
 )();
 ```
 
@@ -159,6 +175,10 @@ let em = new EthersModal({
 )();
 ```
 
+## Check connection
+
+You can check if EthersModal is connected either manually, or by listening (or just getting its value) `isConnected$`, it checks if the connection object has all other fields valorized and notifies listeners only when there's a change in state.
+
 ## Disconnect
 
 Simply call `.disconnect()` on your EthersModal instance to disconnect from the wallet.
@@ -223,6 +243,22 @@ let DemoWallet = {
         };
     }
 };
+```
+
+## Personalization
+
+Plenty of personalization can be integrated in this library. If you have a good idea just submit it as a feature request in the issue on GitHub.
+
+For the time being the values you can feed to the EthersModal constructor are:
+
+```js
+let em = new EthersModal({
+    providerOpts: myWallets, // Optional, dafault EthersModal.providers.array
+    cacheProvider: true, // Optional, default false
+    width: "80vw", // Optional, default 90vw
+    maxWidth: "640px", // Optional, default 480px
+    syncRate: 450 // Optional, default 1000
+});
 ```
 
 ## Contributing
