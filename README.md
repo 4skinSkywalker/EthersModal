@@ -26,17 +26,11 @@ This is especially useful if you want to react with your code to changes in all 
 
 ## Getting started
 
-The easiest example you can try is using the default wallets (MetaMask and Binance Chain Wallet):
+The easiest example you can try is using the default settings:
 
 ```js
-// Get the default wallets
-let myWallets = EthersModal.providers.array;
-
-// Make an instance of EthersModal
-let em = new EthersModal({
-    providerOpts: myWallets,
-    cacheProvider: true
-});
+// Make an instance of EthersModal (by default has just MetaMask and Binance Chain Wallet)
+let em = new EthersModal();
 
 (async () => {
 
@@ -95,12 +89,12 @@ The following example show how to create an EthersModal instance with all the wa
 
 ```js
 // For Coinbase Wallet
-import * as WalletLink from "walletlink";
+import WalletLink from "walletlink";
 
 // For Fortmatic
 import Fortmatic from "fortmatic";
 
-// For WalletConnect
+// For WalletConnect (to make this work see: https://github.com/WalletConnect/walletconnect-monorepo/issues/623)
 import WalletConnectProvider from "@walletconnect/web3-provider";
 
 // For Polkadot Wallet
@@ -131,7 +125,7 @@ walletConnectCfg.package = WalletConnectProvider;
 myWallets.push(walletConnectCfg);
 
 // Setup of Polkadot configurations
-let polkadotCfg = EthersModal.providers.dictionary.PolkadotWallet;
+let polkadotCfg = EthersModal.providers.dictionary.PolkadotCfg;
 polkadotCfg.options.appName = "my-app";
 polkadotCfg.package = [
     PolkadotExtensionDapp,

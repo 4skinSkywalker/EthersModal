@@ -142,7 +142,7 @@ let CoinbaseCfg = {
         let [networkUrl, chainId] = prompt.networkString.split(";");
 
         let { appName } = opts;
-        let walletLink = new pkg.WalletLink({ appName });
+        let walletLink = new pkg({ appName });
         let provider = walletLink.makeWeb3Provider(networkUrl, chainId);
         await provider.enable();
 

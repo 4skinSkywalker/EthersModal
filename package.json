@@ -1,12 +1,12 @@
 {
   "name": "ethersmodal",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "EthersModal is an opinionated library to help developers add support for multiple wallets in their apps.",
   "main": "./src/index.js",
   "dependencies": {
     "bada55asyncutils": "^2.0.3",
     "ethers": "^5.4.7",
-    "smartprompt": "^1.0.2"
+    "smartprompt": "^1.0.3"
   },
   "devDependencies": {
     "webpack": "^5.58.1",

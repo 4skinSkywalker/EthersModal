@@ -4,7 +4,7 @@ let providers = require("./providers");
 
 let LS_KEY = "ETHERS_MODAL_CACHED_PROVIDER";
 
-function EthersModal(opts) {
+function EthersModal(opts = {}) {
 
   this.connection = {
     ethers,
@@ -23,8 +23,11 @@ function EthersModal(opts) {
   // Append this instance to the window object
   window["EthersModal" + this.uuid] = this;
 
-  this.providerOpts = opts.providerOpts;
-  this.cacheProvider = opts.cacheProvider;
+  this.providerOpts = opts.providerOpts || providers;
+  this.cacheProvider = opts.cacheProvider || false;
+
+  this.width = opts.width || "90vw";
+  this.maxWidth = opts.maxWidth || "480px";
 
   if (
     this.providerOpts.some(opt =>
@@ -195,6 +198,10 @@ EthersModal.prototype.getHTMLBoilerplate = function () {
   // Boilerplate for the entire modal
   return `<div class="em${this.uuid}-wrapper">
     <style>
+      body {
+        overflow: hidden;
+      }
+
       .em${this.uuid}-wrapper {
         position: fixed;
         top: 0;
@@ -211,7 +218,7 @@ EthersModal.prototype.getHTMLBoilerplate = function () {
         opacity: 0;
         background-size: 300% 300%;
         animation: MoveBG${this.uuid} 15s ease infinite alternate;
-        transition: all .3s ease;
+        transition: opacity .3s ease;
       }
   
       @keyframes MoveBG${this.uuid} {
@@ -229,7 +236,9 @@ EthersModal.prototype.getHTMLBoilerplate = function () {
   
       .em${this.uuid} {
         display: grid;
-        grid-template-columns: max-content max-content;
+        grid-template-columns: 1fr 1fr;
+        width: ${this.width};
+        max-width: ${this.maxWidth};
         max-height: 80%;
         border-radius: 1rem;
         background-color: #fafafa;
@@ -285,7 +294,7 @@ EthersModal.prototype.getHTMLBoilerplate = function () {
       
       @media (max-width: 400px) {
         .em${this.uuid} {
-          grid-template-columns: max-content;
+          grid-template-columns: 1fr;
         }
         
         .em${this.uuid}-wallet {
@@ -297,7 +306,7 @@ EthersModal.prototype.getHTMLBoilerplate = function () {
         }
         
         .em${this.uuid}-wallet img {
-          display: none;
+          height: 32px;
         }
       }
     </style>
