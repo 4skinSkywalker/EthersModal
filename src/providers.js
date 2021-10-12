@@ -23,7 +23,7 @@ let SmartPrompt = require("smartprompt");
 
 let MetaMaskCfg = {
     display: {
-        logo: "https://raw.githubusercontent.com/4skinSkywalker/Assets-for-my-Codepen/54483bc024d80efe3a3546f54b6938a07735eb3f/EthersModal/metamask.svg",
+        logo: "https://raw.githubusercontent.com/4skinSkywalker/EthersModal/main/img/metamask.svg",
         name: "MetaMask",
         description: "Connect with MetaMask"
     },
@@ -57,7 +57,7 @@ let MetaMaskCfg = {
 
 let BinanceCfg = {
     display: {
-        logo: "https://raw.githubusercontent.com/4skinSkywalker/Assets-for-my-Codepen/54483bc024d80efe3a3546f54b6938a07735eb3f/EthersModal/binance.svg",
+        logo: "https://raw.githubusercontent.com/4skinSkywalker/EthersModal/main/img/binance.svg",
         name: "Binance Wallet",
         description: "Connect with Binance Wallet"
     },
@@ -91,7 +91,7 @@ let BinanceCfg = {
 
 let CoinbaseCfg = {
     display: {
-        logo: "https://raw.githubusercontent.com/4skinSkywalker/Assets-for-my-Codepen/54483bc024d80efe3a3546f54b6938a07735eb3f/EthersModal/coinbase.svg",
+        logo: "https://raw.githubusercontent.com/4skinSkywalker/EthersModal/main/img/coinbase.svg",
         name: "Coinbase Wallet",
         description: "Connect with Coinbase Wallet"
     },
@@ -161,7 +161,7 @@ let CoinbaseCfg = {
 
 let FortmaticCfg = {
     display: {
-        logo: "https://raw.githubusercontent.com/4skinSkywalker/Assets-for-my-Codepen/54483bc024d80efe3a3546f54b6938a07735eb3f/EthersModal/fortmatic.svg",
+        logo: "https://raw.githubusercontent.com/4skinSkywalker/EthersModal/main/img/fortmatic.svg",
         name: "Fortmatic",
         description: "Connect with Fortmatic"
     },
@@ -228,7 +228,7 @@ let FortmaticCfg = {
 
 let WalletConnectCfg = {
     display: {
-        logo: "https://raw.githubusercontent.com/4skinSkywalker/Assets-for-my-Codepen/54483bc024d80efe3a3546f54b6938a07735eb3f/EthersModal/walletconnect.svg",
+        logo: "https://raw.githubusercontent.com/4skinSkywalker/EthersModal/main/img/walletconnect.svg",
         name: "WalletConnect",
         description: "Connect with WalletConnect"
     },
@@ -267,7 +267,7 @@ let WalletConnectCfg = {
 
 let PolkadotCfg = {
     display: {
-        logo: "https://raw.githubusercontent.com/4skinSkywalker/Assets-for-my-Codepen/54483bc024d80efe3a3546f54b6938a07735eb3f/EthersModal/polkadot.svg",
+        logo: "https://raw.githubusercontent.com/4skinSkywalker/EthersModal/main/img/polkadot.svg",
         name: "Polkadot{.js}",
         description: "Connect with Polkadot{.js}"
     },
