@@ -27,7 +27,7 @@ This is especially useful if you want to react with your code to changes in all 
 
 ## Try it
 
-Head over to [[TODO]] and try with your MetaMask or Binance Chain wallets.
+Head over to [https://4skinskywalker.github.io/EthersModal/](https://4skinskywalker.github.io/EthersModal/) and try with your MetaMask or Binance Chain wallets.
 
 ## Getting started
 
