@@ -29,6 +29,8 @@ function EthersModal(opts = {}) {
   this.width = opts.width || "90vw";
   this.maxWidth = opts.maxWidth || "480px";
 
+  this.updateVariablesInterval;
+
   // Make isConnected subordinate to the existence of all other fields
   let obsToMonitor = [
     this.connection.provider$,
@@ -47,10 +49,6 @@ function EthersModal(opts = {}) {
       }
     })
   );
-
-  this.networkChangedInterval;
-  this.accountsChangedInterval;
-  this.baseTokenBalanceChangedInterval;
 
   // Everything is "encapsulate" by this UUID
   this.uuid = Math.random().toString(36).slice(2);
@@ -119,15 +117,19 @@ EthersModal.prototype.connect = function () {
 EthersModal.prototype.disconnect = function () {
   this.connection.provider$.next(null);
   this.connection.signer$.next(null);
+  
+  this.resetVariables();
+
+  this.updateVariablesInterval.stop();
+  this.updateVariablesInterval = null;
+
+  this.clearCachedProvider();
+};
+
+EthersModal.prototype.resetVariables = function () {
   this.connection.chainId$.next(null);
   this.connection.selectedAccount$.next(null);
   this.connection.baseTokenBalance$.next(null);
-
-  this.networkChangedInterval.stop();
-  this.accountsChangedInterval.stop();
-  this.baseTokenBalanceChangedInterval.stop();
-
-  this.clearCachedProvider();
 };
 
 EthersModal.prototype.clearCachedProvider = function () {
@@ -165,17 +167,34 @@ EthersModal.prototype.onWalletClick = async function (providerOptIndex) {
 
 EthersModal.prototype.syncingIntervals = async function (getNetwork, getAccounts) {
 
-  let updateChainId = async () => {
-    let { chainId } = await getNetwork();
+  let updateVariables = async () => {
+
+    // Chain id
+    let chainId;
+    try {
+      let network = await getNetwork();
+      chainId = network.chainId;
+    }
+    catch (err) {
+      console.error("Chain id doesn't seem available...");
+      this.connection.chainId$.next(null);
+      return;
+    }
     if (this.connection.chainId$.getValue() !== chainId) {
       this.connection.chainId$.next(chainId);
     }
-  };
-  await updateChainId();
 
-  let updateSelectedAccount = async () => {
+    // Selected account
     let selectedAccount;
-    let response = await getAccounts();
+    let response;
+    try {
+      response = await getAccounts();
+    }
+    catch (err) {
+      console.error("Selected account doesn't seem available...");
+      this.connection.selectedAccount$.next(null);
+      return;
+    }
     if (Array.isArray(response)) {
       selectedAccount = response[0];
     }
@@ -185,38 +204,31 @@ EthersModal.prototype.syncingIntervals = async function (getNetwork, getAccounts
     if (this.connection.selectedAccount$.getValue() !== selectedAccount) {
       this.connection.selectedAccount$.next(selectedAccount);
     }
-  };
-  await updateSelectedAccount();
 
-  let updateBaseTokenBalance = async () => {
+    // Base token balance
     let signer = this.connection.signer$.getValue();
     if (isNotNullOrUndefined(signer)) {
-      let balance = await signer.getBalance();
+      let balance;
+      try {
+        balance = await signer.getBalance();
+      }
+      catch (err) {
+        console.error("Base token amount doesn't seem available...");
+        this.connection.baseTokenBalance$.next(null);
+        return;
+      }
       let ether = ethers.utils.formatEther(balance);
       if (this.connection.baseTokenBalance$.getValue() !== ether) {
         this.connection.baseTokenBalance$.next(ether);
       }
     }
   };
-  await updateBaseTokenBalance();
+  await updateVariables();
 
-  // Handles changes in network
-  if (!this.networkChangedInterval) {
-    this.networkChangedInterval = new SmartInterval(updateChainId, this.syncRate);
+  if (!this.updateVariablesInterval) {
+    this.updateVariablesInterval = new SmartInterval(updateVariables, this.syncRate);
   }
-  this.networkChangedInterval.start();
-
-  // Handles changes in accounts
-  if (!this.accountsChangedInterval) {
-    this.accountsChangedInterval = new SmartInterval(updateSelectedAccount, this.syncRate);
-  }
-  this.accountsChangedInterval.start();
-
-  // Handles changes in base token balance
-  if (!this.baseTokenBalanceChangedInterval) {
-    this.baseTokenBalanceChangedInterval = new SmartInterval(updateBaseTokenBalance, this.syncRate);
-  }
-  this.baseTokenBalanceChangedInterval.start();
+  this.updateVariablesInterval.start();
 };
 
 EthersModal.prototype.fade = function (zeroOrOne) {

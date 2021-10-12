@@ -58,6 +58,7 @@
             box-shadow: 0 6px 12px #0004;
         }
         .divider {
+            position: relative;
             display: grid;
             align-content: flex-start;
             grid-gap: 1.5rem;
@@ -68,26 +69,75 @@
             background-color: var(--figure-color);
             box-shadow: 0 12px 24px #000a;
         }
+        .rgb-backlight::after {
+            content: "";
+            position: absolute;
+            z-index: -2;
+            background-image: linear-gradient(
+                45deg,
+                red,
+                orange,
+                yellow,
+                green,
+                cyan,
+                blue,
+                violet,
+                magenta,
+                pink,
+                red
+            );
+            background-repeat: repeat;
+            background-size: 300%;
+            inset: 8px;
+            filter: blur(15px);
+            animation-name: MoveRGB;
+            animation-duration: inherit;
+            animation-iteration-count: infinite;
+            animation-direction: inherit;
+            animation-delay: inherit;
+        }
+        .rgb-backlight::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            border-radius: inherit;
+            background-color: inherit;
+        }
+        @keyframes MoveRGB {
+            0% {
+                background-position: top left;
+            }
+            50% {
+                background-position: bottom right;
+            }
+        }
         .field {
+            position: relative;
             padding: 1rem;
             border-radius: 1rem;
             color: var(--text-light-color);
             background-color: var(--ground-color);
             box-shadow: 0 8px 16px #0009;
             word-break: break-word;
+            isolation: isolate;
         }
         .field [class] {
+            position: relative;
             margin-top: .5rem;
             padding: .5rem;
             border-radius: 1rem;
             color: var(--text-dark-color);
             background-color: var(--figure-color);
             box-shadow: 0 4px 8px #0008;
+            isolation: isolate;
         }
         @media (max-width: 600px) {
             .connection {
                 grid-template-columns: max-content;
-                align-content: initial;
             }
         }
     </style>
@@ -99,17 +149,6 @@
         <button class="connect">Connect</button>
     </div>
     <div class="connection">
-        <div class="divider">
-            <div class="field">
-                <div>Previous chain id</div>
-                <div class="prev-chain-id">-</div>
-            </div>
-            <div class="field">
-                <div>Previous selected account</div>
-                <div class="prev-selected-account">-</div>
-            </div>
-            <p style="color: var(--text-dark-color);">A field only changes on a <b>specific wallet interaction</b>.</p>
-        </div>
         <div class="divider">
             <div class="field">
                 <div>Chain id</div>
@@ -128,11 +167,20 @@
     <script src="./main.js"></script>
     <script>
         let connectBtn = document.querySelector(".connect");
-        let prevChainDiv = document.querySelector(".prev-chain-id");
-        let prevAccountDiv = document.querySelector(".prev-selected-account");
         let chainDiv = document.querySelector(".chain-id");
         let accountDiv = document.querySelector(".selected-account");
         let balanceDiv = document.querySelector(".base-token-balance");
+
+        // Some randomness in the RGB backlight animation
+        let dividerDiv = document.querySelector(".divider");
+        let fieldDividerDivs = [...document.querySelectorAll(".field")];
+        let fieldDivs = [...document.querySelectorAll(".field [class]")];
+        [dividerDiv, ...fieldDividerDivs, ...fieldDivs]
+            .forEach(el => {
+                el.style.animationDelay = (Math.random() * 3).toFixed(3) + "s";
+                el.style.animationDuration = (8 + (Math.random() * 8)).toFixed(3) + "s";
+                el.style.animationDirection = (Math.random() > 0.5) ? "alternate" : "alternate-reverse";
+            });
         
         let em = new EthersModal();
 
@@ -143,18 +191,38 @@
             connectBtn.addEventListener("click", connect);
         };
 
-        let setupUI = function ({ chainId$, selectedAccount$, baseTokenBalance$ }) {
+        let setupUI = function ({ chainId$, selectedAccount$, baseTokenBalance$, isConnected$ }) {
             chainId$.subscribe(newChainId => {
-                prevChainDiv.innerText = chainDiv.innerText;
                 chainDiv.innerText = (newChainId) ? newChainId : "-";
             });
             selectedAccount$.subscribe(newSelectedAccount => {
-                prevAccountDiv.innerText = accountDiv.innerText;
                 accountDiv.innerText = (newSelectedAccount) ? newSelectedAccount : "-";
             });
             baseTokenBalance$.subscribe(newBaseTokenBalance => {
                 balanceDiv.innerText = (newBaseTokenBalance) ? newBaseTokenBalance : "-";
             });
+
+            // If EthersModal is connected, then it lights up with RGB backlight animation
+            isConnected$.subscribe(isConnected => {
+                if (isConnected) {
+                    dividerDiv.classList.add("rgb-backlight");
+                    fieldDividerDivs.forEach(divider =>
+                        divider.classList.add("rgb-backlight")
+                    );
+                    fieldDivs.forEach(field =>
+                        field.classList.add("rgb-backlight")
+                    );
+                }
+                else {
+                    dividerDiv.classList.remove("rgb-backlight");
+                    fieldDividerDivs.forEach(divider =>
+                        divider.classList.remove("rgb-backlight")
+                    );
+                    fieldDivs.forEach(field =>
+                        field.classList.remove("rgb-backlight")
+                    );
+                }
+            })
         }
 
         let connect = async function () {
