@@ -315,7 +315,6 @@ let PolkadotCfg = {
             figureColor: "#2d2f31",
             groundColor: "#fafafa",
             title: "Choose account and network",
-            postscription: "Your EVM address will be shown in the top-left corner",
             template: `<div style="display: grid; grid-gap: 1rem;">
 <span>To connect to the Reef chain you need to pair your Polkadot address. If you didn't bind already, then follow the tutorial <a href="https://freddycorly.medium.com/create-your-reef-chain-account-6b06ad323c6" target="_blank">Create your Reef chain account</a></span>
 <div>
