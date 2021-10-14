@@ -115,31 +115,32 @@ let CoinbaseCfg = {
         }
 
         // Spawn a modal and ask the user to which network to connect
-        let prompt = await new SmartPrompt(
-            {
-                figureColor: "#2d2f31",
-                groundColor: "#fafafa",
-                textColor: "#111",
-                title: "Choose a network",
-                template: `<div style="display: grid; grid-gap: 1rem;">
-    <div>
-        <p>
-            <label>Network</label>
-        </p>
-        <select name="networkString" required="true">
-            <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
-            <option value="https://rinkeby.infura.io/v3/${opts.infuraApiKey};4">Ethereum Rinkeby</option>
-            <option value="https://bsc-dataseed.binance.org/;56">Binance Mainnet</option>
-            <option value="https://bsc-dataseed.binance.org/;97">Binance Testnet</option>
-            <option value="https://rpc-mainnet.maticvigil.com/;187">Polygon Mainnet</option>
-            <option value="https://rpc-mumbai.matic.today;80001">Polygon Mumbai</option>
-        </select>
-    </div>
-</div>`
-            }
-        );
+        let prompt = await new SmartPrompt();
 
-        let [networkUrl, chainId] = prompt.networkString.split(";");
+        prompt.init({
+            figureColor: "#2d2f31",
+            groundColor: "#fafafa",
+            title: "Choose a network",
+            template: `<div style="display: grid; grid-gap: 1rem;">
+<div>
+    <p>
+        <label>Network</label>
+    </p>
+    <select name="networkString" required="true">
+        <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
+        <option value="https://rinkeby.infura.io/v3/${opts.infuraApiKey};4">Ethereum Rinkeby</option>
+        <option value="https://bsc-dataseed.binance.org/;56">Binance Mainnet</option>
+        <option value="https://bsc-dataseed.binance.org/;97">Binance Testnet</option>
+        <option value="https://rpc-mainnet.maticvigil.com/;187">Polygon Mainnet</option>
+        <option value="https://rpc-mumbai.matic.today;80001">Polygon Mumbai</option>
+    </select>
+</div>
+</div>`
+        });
+
+        let result = await prompt.spawn();
+
+        let [networkUrl, chainId] = result.networkString.split(";");
 
         let { appName } = opts;
         let walletLink = new pkg({ appName });
@@ -185,31 +186,32 @@ let FortmaticCfg = {
         }
 
         // Spawn a modal and ask the user to which network to connect
-        let prompt = await new SmartPrompt(
-            {
-                figureColor: "#2d2f31",
-                groundColor: "#fafafa",
-                textColor: "#111",
-                title: "Choose a network",
-                template: `<div style="display: grid; grid-gap: 1rem;">
-    <div>
-        <p>
-            <label>Network</label>
-        </p>
-        <select name="networkString" required="true">
-            <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
-            <option value="https://rinkeby.infura.io/v3/${opts.infuraApiKey};4">Ethereum Rinkeby</option>
-            <option value="https://bsc-dataseed.binance.org/;56">Binance Mainnet</option>
-            <option value="https://bsc-dataseed.binance.org/;97">Binance Testnet</option>
-            <option value="https://rpc-mainnet.maticvigil.com/;187">Polygon Mainnet</option>
-            <option value="https://rpc-mumbai.matic.today;80001">Polygon Mumbai</option>
-        </select>
-    </div>
-</div>`
-            }
-        );
+        let prompt = await new SmartPrompt();
 
-        let [rpcUrl, chainId] = prompt.networkString.split(";");
+        prompt.init({
+            figureColor: "#2d2f31",
+            groundColor: "#fafafa",
+            title: "Choose a network",
+            template: `<div style="display: grid; grid-gap: 1rem;">
+<div>
+    <p>
+        <label>Network</label>
+    </p>
+    <select name="networkString" required="true">
+        <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
+        <option value="https://rinkeby.infura.io/v3/${opts.infuraApiKey};4">Ethereum Rinkeby</option>
+        <option value="https://bsc-dataseed.binance.org/;56">Binance Mainnet</option>
+        <option value="https://bsc-dataseed.binance.org/;97">Binance Testnet</option>
+        <option value="https://rpc-mainnet.maticvigil.com/;187">Polygon Mainnet</option>
+        <option value="https://rpc-mumbai.matic.today;80001">Polygon Mumbai</option>
+    </select>
+</div>
+</div>`
+        });
+
+        let result = await prompt.spawn();
+
+        let [rpcUrl, chainId] = result.networkString.split(";");
 
         let fm = new pkg(opts.fortmaticApiKey, { rpcUrl, chainId });
 
@@ -303,35 +305,34 @@ let PolkadotCfg = {
             .join("");
 
         // Spawn a modal and ask the user to which account to connect
-        let prompt = await new SmartPrompt(
-            {
-                figureColor: "#2d2f31",
-                groundColor: "#fafafa",
-                textColor: "#111",
-                title: "Choose account and network",
-                template: `<div style="display: grid; grid-gap: 1rem;">
-    <div>
-        <p>
-            <label>Account</label>
-        </p>
-        <select name="account" required="true">
-            ${accountOpts}
-        </select>
-    </div>
-    <div>
-        <p>
-            <label>Network</label>
-        </p>
-        <select name="networkString" required="true">
-            <option value="wss://rpc-testnet.reefscan.com/ws;reef-testnet">Reef Testnet</option>
-            <option value="wss://rpc.reefscan.com/ws;reef-mainnet" disabled="true">Reef Mainnet</option>
-        </select>
-    </div>
-</div>`
-            }
-        );
+        let prompt = await new SmartPrompt();
 
-        let { account, networkString } = prompt;
+        prompt.init({
+            figureColor: "#2d2f31",
+            groundColor: "#fafafa",
+            title: "Choose account and network",
+            template: `<div style="display: grid; grid-gap: 1rem;">
+<div>
+    <p>
+        <label>Account</label>
+    </p>
+    <select name="account" required="true">
+        ${accountOpts}
+    </select>
+</div>
+<div>
+    <p>
+        <label>Network</label>
+    </p>
+    <select name="networkString" required="true">
+        <option value="wss://rpc-testnet.reefscan.com/ws;reef-testnet">Reef Testnet</option>
+        <option value="wss://rpc.reefscan.com/ws;reef-mainnet" disabled="true">Reef Mainnet</option>
+    </select>
+</div>
+</div>`
+        });
+
+        let { account, networkString } = await prompt.spawn();
         let [networkUrl, chainId] = networkString.split(";");
 
         let provider = new reefDefi_evmProvider.Provider({
