@@ -262,10 +262,6 @@ EthersModal.prototype.getHTMLBoilerplate = function () {
   // Boilerplate for the entire modal
   return `<div class="em${this.uuid}-wrapper">
     <style>
-      body {
-        overflow: hidden;
-      }
-
       .em${this.uuid}-wrapper {
         position: fixed;
         top: 0;
