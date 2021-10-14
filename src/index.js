@@ -44,9 +44,7 @@ function EthersModal(opts = {}) {
       let isConnected = obsToMonitor.every(obs =>
         isNotNullOrUndefined(obs.getValue())
       );
-      if (this.connection.isConnected$.getValue() !== isConnected) {
-        this.connection.isConnected$.next(isConnected);
-      }
+      this.connection.isConnected$.next(isConnected);
     })
   );
 

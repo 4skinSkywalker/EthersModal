@@ -177,7 +177,7 @@ let em = new EthersModal({
 
 ## Check connection
 
-You can check if EthersModal is connected either manually, or by listening (or just getting its value) `isConnected$`, it checks if the connection object has all other fields valorized and notifies listeners only when there's a change in state.
+You can check if EthersModal is connected either manually, or by listening (or just getting its value) `isConnected$`, it checks if the connection object has all other fields valorized and notifies listeners when any property in the connection object is emitting a new value.
 
 ## Disconnect
 
