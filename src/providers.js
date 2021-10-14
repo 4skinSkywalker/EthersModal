@@ -331,7 +331,7 @@ let PolkadotCfg = {
     </p>
     <select name="networkString" required="true">
         <option value="wss://rpc-testnet.reefscan.com/ws;reef-testnet">Reef Testnet</option>
-        <option value="wss://rpc.reefscan.com/ws;reef-mainnet" disabled="true">Reef Mainnet</option>
+        <option value="wss://rpc.reefscan.com/ws;reef-mainnet">Reef Mainnet</option>
     </select>
 </div>
 </div>`
