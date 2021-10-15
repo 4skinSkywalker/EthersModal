@@ -139,18 +139,29 @@ EthersModal.prototype.onWalletClick = async function (providerOptIndex) {
   // Get the providerOpt selected by the user
   let providerOpt = this.providerOpts[providerOptIndex];
 
-  // Await the evaluation of the connector
-  let { provider, signer, getNetwork, getAccounts } = await providerOpt
-    .connector(
-      providerOpt.package,
-      providerOpt.options
-    );
+  let result;
+  try {
 
-  this.connection.provider$.next(provider);
-  this.connection.signer$.next(signer);
+    // Await the evaluation of the connector
+    result = await providerOpt
+      .connector(
+        providerOpt.package,
+        providerOpt.options
+      );
+  }
+  catch (err) {
+
+    // Clear the cache because it can be that the user dismissed the modal on resumed connection
+    this.clearCachedProvider();
+    this.reject(err);
+    return;
+  }
+
+  this.connection.provider$.next(result.provider);
+  this.connection.signer$.next(result.signer);
 
   // Sync variables
-  await this.syncingIntervals(getNetwork, getAccounts);
+  await this.syncingIntervals(result.getNetwork, result.getAccounts);
 
   // Cache the current provider
   if (this.cacheProvider) {
