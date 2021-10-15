@@ -32,11 +32,7 @@ let MetaMaskCfg = {
     connector: async () => {
         let provider = null;
         if (window.ethereum) {
-            let providers = window.ethereum.providers;
-            provider = providers.find(p => p.isMetaMask);
-            if (!provider) {
-                throw new Error("Can't find MetaMask.");
-            }
+            provider = window.ethereum;
             try {
                 await provider.request({ method: 'eth_requestAccounts' });
             } catch (error) {
