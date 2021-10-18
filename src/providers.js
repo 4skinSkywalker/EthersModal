@@ -248,17 +248,37 @@ let WalletConnectCfg = {
             throw new Error("Missing dependency, you must set package property as the following package: https://www.npmjs.com/package/@walletconnect/web3-provider");
         }
 
-        //  Create WalletConnect Provider
-        let provider = new pkg({ 
-            rpc: {
-                1: "https://mainnet.infura.io/v3/" + opts.infuraApiKey,
-                4: "https://rinkeby.infura.io/v3/" + opts.infuraApiKey,
-                56: "https://bsc-dataseed.binance.org/",
-                97: "https://bsc-dataseed.binance.org/",
-                187: "https://rpc-mainnet.maticvigil.com/",
-                80001: "https://rpc-mumbai.matic.today"
-            }
+        // Spawn a modal and ask the user to which network to connect
+        let prompt = await new SmartPrompt();
+
+        prompt.init({
+            figureColor: "#2d2f31",
+            groundColor: "#fafafa",
+            title: "Choose a network",
+            template: `<div style="display: grid; grid-gap: 1rem;">
+<div>
+    <p>
+        <label>Network</label>
+    </p>
+    <select name="networkString" required="true">
+        <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
+        <option value="https://rinkeby.infura.io/v3/${opts.infuraApiKey};4">Ethereum Rinkeby</option>
+        <option value="https://bsc-dataseed.binance.org/;56">Binance Mainnet</option>
+        <option value="https://bsc-dataseed.binance.org/;97">Binance Testnet</option>
+        <option value="https://rpc-mainnet.maticvigil.com/;187">Polygon Mainnet</option>
+        <option value="https://rpc-mumbai.matic.today;80001">Polygon Mumbai</option>
+    </select>
+</div>
+</div>`
         });
+
+        let result = await prompt.spawn();
+
+        let [rpcUrl, chainId] = result.networkString.split(";");
+
+        // Create WalletConnect Provider
+        // Restricting the RPC mapping to just the entry that the user has choosen, this is useful for those wallets that don't let the user change the network
+        let provider = new pkg({ rpc: { [chainId]: rpcUrl } });
         
         //  Enable session (triggers QR Code modal)
         await provider.enable();
