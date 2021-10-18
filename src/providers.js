@@ -130,7 +130,7 @@ let CoinbaseCfg = {
         <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
         <option value="https://rinkeby.infura.io/v3/${opts.infuraApiKey};4">Ethereum Rinkeby</option>
         <option value="https://bsc-dataseed.binance.org/;56">Binance Mainnet</option>
-        <option value="https://bsc-dataseed.binance.org/;97">Binance Testnet</option>
+        <option value="https://data-seed-prebsc-1-s1.binance.org:8545/;97">Binance Testnet</option>
         <option value="https://rpc-mainnet.maticvigil.com/;187">Polygon Mainnet</option>
         <option value="https://rpc-mumbai.matic.today;80001">Polygon Mumbai</option>
     </select>
@@ -201,7 +201,7 @@ let FortmaticCfg = {
         <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
         <option value="https://rinkeby.infura.io/v3/${opts.infuraApiKey};4">Ethereum Rinkeby</option>
         <option value="https://bsc-dataseed.binance.org/;56">Binance Mainnet</option>
-        <option value="https://bsc-dataseed.binance.org/;97">Binance Testnet</option>
+        <option value="https://data-seed-prebsc-1-s1.binance.org:8545/;97">Binance Testnet</option>
         <option value="https://rpc-mainnet.maticvigil.com/;187">Polygon Mainnet</option>
         <option value="https://rpc-mumbai.matic.today;80001">Polygon Mumbai</option>
     </select>
@@ -254,7 +254,7 @@ let WalletConnectCfg = {
                 1: "https://mainnet.infura.io/v3/" + opts.infuraApiKey,
                 4: "https://rinkeby.infura.io/v3/" + opts.infuraApiKey,
                 56: "https://bsc-dataseed.binance.org/",
-                97: "https://bsc-dataseed.binance.org/",
+                97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
                 187: "https://rpc-mainnet.maticvigil.com/",
                 80001: "https://rpc-mumbai.matic.today"
             }
