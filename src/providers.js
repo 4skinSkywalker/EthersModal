@@ -249,7 +249,16 @@ let WalletConnectCfg = {
         }
 
         //  Create WalletConnect Provider
-        let provider = new pkg({ infuraId: opts.infuraApiKey });
+        let provider = new pkg({ 
+            rpc: {
+                1: "https://mainnet.infura.io/v3/" + opts.infuraApiKey,
+                4: "https://rinkeby.infura.io/v3/" + opts.infuraApiKey,
+                56: "https://bsc-dataseed.binance.org/",
+                97: "https://bsc-dataseed.binance.org/",
+                187: "https://rpc-mainnet.maticvigil.com/",
+                80001: "https://rpc-mumbai.matic.today"
+            }
+        });
         
         //  Enable session (triggers QR Code modal)
         await provider.enable();
