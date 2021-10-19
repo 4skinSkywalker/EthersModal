@@ -65,6 +65,14 @@ let MetaMaskCfg = {
     package: null,
     connector: async () => {
         let provider = await detectEthereumProvider();
+        if (!provider) {
+            throw new Error("MetaMask was not found.");
+        }
+        try {
+            await provider.request({ method: 'eth_requestAccounts' });
+        } catch (error) {
+            throw new Error("User rejected.");
+        }
 
         // Get ethers provider and signer
         let ethersProvider = new ethers.providers.Web3Provider(provider, "any");
