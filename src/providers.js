@@ -124,7 +124,7 @@ let CoinbaseCfg = {
             template: `<div style="display: grid; grid-gap: 1rem;">
 <div>
     <p>
-        <label>Network</label>
+        <label>WalletLink - Network</label>
     </p>
     <select name="networkString" required="true">
         <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
@@ -191,7 +191,7 @@ let FortmaticCfg = {
         prompt.init({
             figureColor: "#2d2f31",
             groundColor: "#fafafa",
-            title: "Choose a network",
+            title: "Fortmatic - Choose a network",
             template: `<div style="display: grid; grid-gap: 1rem;">
 <div>
     <p>
@@ -258,7 +258,7 @@ let WalletConnectCfg = {
             template: `<div style="display: grid; grid-gap: 1rem;">
 <div>
     <p>
-        <label>Network</label>
+        <label>WalletConnect - Network</label>
     </p>
     <select name="networkString" required="true">
         <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
@@ -344,7 +344,7 @@ let PolkadotCfg = {
         prompt.init({
             figureColor: "#2d2f31",
             groundColor: "#fafafa",
-            title: "Choose account and network",
+            title: "Polkadot{.js} - Choose account & network",
             template: `<div style="display: grid; grid-gap: 1rem;">
 <span>To connect to the Reef chain you need to pair your Polkadot address. If you didn't bind already, then follow the tutorial <a href="https://freddycorly.medium.com/create-your-reef-chain-account-6b06ad323c6" target="_blank">Create your Reef chain account</a></span>
 <div>

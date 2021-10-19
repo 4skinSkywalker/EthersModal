@@ -132,6 +132,13 @@ EthersModal.prototype.resetVariables = function () {
 
 EthersModal.prototype.clearCachedProvider = function () {
   localStorage.removeItem(LS_KEY);
+
+  // Manually removing leftovers from wallet providers
+  Object.keys(localStorage).forEach(key => {
+    if (/(walletlink|walletconnect)/i.test(key)) {
+      localStorage.removeItem(key);
+    }
+  });
 };
 
 EthersModal.prototype.onWalletClick = async function (providerOptIndex) {
@@ -185,8 +192,12 @@ EthersModal.prototype.syncingIntervals = async function (getNetwork, getAccounts
       chainId = network.chainId;
     }
     catch (err) {
-      console.error("Chain id doesn't seem available...");
-      this.connection.chainId$.next(null);
+      console.error("Chain id doesn't seem available...", err);
+
+      // If it was impossible to get, then emit it as null and return
+      if (this.connection.chainId$.getValue() !== null) {
+        this.connection.chainId$.next(null);
+      }
       return;
     }
     if (this.connection.chainId$.getValue() !== chainId) {
@@ -200,8 +211,18 @@ EthersModal.prototype.syncingIntervals = async function (getNetwork, getAccounts
       response = await getAccounts();
     }
     catch (err) {
-      console.error("Selected account doesn't seem available...");
-      this.connection.selectedAccount$.next(null);
+      console.error("Selected account doesn't seem available...", err);
+
+      // If user denied the request (e.g. Fortmatic), then disconnect
+      if (err.code == "-32603") {
+        this.disconnect();
+        return;
+      }
+
+      // If it was impossible to get, then emit it as null and return
+      if (this.connection.selectedAccount$.getValue() !== null) {
+        this.connection.selectedAccount$.next(null);
+      }
       return;
     }
     if (Array.isArray(response)) {
@@ -222,8 +243,12 @@ EthersModal.prototype.syncingIntervals = async function (getNetwork, getAccounts
         balance = await signer.getBalance();
       }
       catch (err) {
-        console.error("Base token amount doesn't seem available...");
-        this.connection.baseTokenBalance$.next(null);
+        console.error("Base token amount doesn't seem available...", err);
+
+        // If it was impossible to get, then emit it as null and return
+        if (this.connection.baseTokenBalance$.getValue() !== null) {
+          this.connection.baseTokenBalance$.next(null);
+        }
         return;
       }
       let ether = ethers.utils.formatEther(balance);
