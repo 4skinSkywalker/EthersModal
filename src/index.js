@@ -118,8 +118,10 @@ EthersModal.prototype.disconnect = function () {
   
   this.resetVariables();
 
-  this.updateVariablesInterval.stop();
-  this.updateVariablesInterval = null;
+  if (this.updateVariablesInterval) {
+    this.updateVariablesInterval.stop();
+    this.updateVariablesInterval = null;
+  }
 
   this.clearCachedProvider();
 };
@@ -216,7 +218,7 @@ EthersModal.prototype.syncingIntervals = async function (getNetwork, getAccounts
       // If user denied the request (e.g. Fortmatic), then disconnect
       if (err.code == "-32603") {
         this.disconnect();
-        return;
+        throw err;
       }
 
       // If it was impossible to get, then emit it as null and return
@@ -257,6 +259,8 @@ EthersModal.prototype.syncingIntervals = async function (getNetwork, getAccounts
       }
     }
   };
+
+  // Await the above immediately
   await updateVariables();
 
   if (!this.updateVariablesInterval) {
