@@ -1,6 +1,39 @@
 let { ethers } = require("ethers");
 let SmartPrompt = require("smartprompt");
 
+let getRPCs = (infuraKey) => ([
+    {
+        rpcUrl: "https://mainnet.infura.io/v3/" + infuraKey,
+        chainId: 1,
+        networkName: "Ethereum Mainnet"
+    },
+    {
+        rpcUrl: "https://rinkeby.infura.io/v3/" + infuraKey,
+        chainId: 4,
+        networkName: "Ethereum Testnet"
+    },
+    {
+        rpcUrl: "https://bsc-dataseed.binance.org/",
+        chainId: 56,
+        networkName: "Binance Mainnet"
+    },
+    {
+        rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+        chainId: 97,
+        networkName: "Binance Testnet"
+    },
+    {
+        rpcUrl: "https://rpc-mainnet.maticvigil.com/",
+        chainId: 187,
+        networkName: "Polygon Mainnet"
+    },
+    {
+        rpcUrl: "https://rpc-mumbai.matic.today/",
+        chainId: 80001,
+        networkName: "Polygon Testnet"
+    }
+]);
+
 // let DemoWallet = {
 //     display: {
 //         logo: "[[logo]]",
@@ -117,22 +150,23 @@ let CoinbaseCfg = {
         // Spawn a modal and ask the user to which network to connect
         let prompt = await new SmartPrompt();
 
+        let rpcOptionsTemplate = getRPCs(opts.infuraApiKey)
+            .map(({ rpcUrl, chainId, networkName }) =>
+                `<option value="${rpcUrl};${chainId}">${networkName}</option>`
+            )
+            .join("");
+
         prompt.init({
             figureColor: "#2d2f31",
             groundColor: "#fafafa",
-            title: "Choose a network",
+            title: "WalletLink - Choose a network",
             template: `<div style="display: grid; grid-gap: 1rem;">
 <div>
     <p>
-        <label>WalletLink - Network</label>
+        <label>Network</label>
     </p>
     <select name="networkString" required="true">
-        <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
-        <option value="https://rinkeby.infura.io/v3/${opts.infuraApiKey};4">Ethereum Rinkeby</option>
-        <option value="https://bsc-dataseed.binance.org/;56">Binance Mainnet</option>
-        <option value="https://data-seed-prebsc-1-s1.binance.org:8545/;97">Binance Testnet</option>
-        <option value="https://rpc-mainnet.maticvigil.com/;187">Polygon Mainnet</option>
-        <option value="https://rpc-mumbai.matic.today;80001">Polygon Mumbai</option>
+        ${rpcOptionsTemplate}
     </select>
 </div>
 </div>`
@@ -188,6 +222,12 @@ let FortmaticCfg = {
         // Spawn a modal and ask the user to which network to connect
         let prompt = await new SmartPrompt();
 
+        let rpcOptionsTemplate = getRPCs(opts.infuraApiKey)
+            .map(({ rpcUrl, chainId, networkName }) =>
+                `<option value="${rpcUrl};${chainId}">${networkName}</option>`
+            )
+            .join("");
+
         prompt.init({
             figureColor: "#2d2f31",
             groundColor: "#fafafa",
@@ -198,12 +238,7 @@ let FortmaticCfg = {
         <label>Network</label>
     </p>
     <select name="networkString" required="true">
-        <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
-        <option value="https://rinkeby.infura.io/v3/${opts.infuraApiKey};4">Ethereum Rinkeby</option>
-        <option value="https://bsc-dataseed.binance.org/;56">Binance Mainnet</option>
-        <option value="https://data-seed-prebsc-1-s1.binance.org:8545/;97">Binance Testnet</option>
-        <option value="https://rpc-mainnet.maticvigil.com/;187">Polygon Mainnet</option>
-        <option value="https://rpc-mumbai.matic.today;80001">Polygon Mumbai</option>
+        ${rpcOptionsTemplate}
     </select>
 </div>
 </div>`
@@ -251,22 +286,23 @@ let WalletConnectCfg = {
         // Spawn a modal and ask the user to which network to connect
         let prompt = await new SmartPrompt();
 
+        let rpcOptionsTemplate = getRPCs(opts.infuraApiKey)
+            .map(({ rpcUrl, chainId, networkName }) =>
+                `<option value="${rpcUrl};${chainId}">${networkName}</option>`
+            )
+            .join("");
+
         prompt.init({
             figureColor: "#2d2f31",
             groundColor: "#fafafa",
-            title: "Choose a network",
+            title: "WalletConnect - Choose a network",
             template: `<div style="display: grid; grid-gap: 1rem;">
 <div>
     <p>
-        <label>WalletConnect - Network</label>
+        <label>Network</label>
     </p>
     <select name="networkString" required="true">
-        <option value="https://mainnet.infura.io/v3/${opts.infuraApiKey};1">Ethereum Mainnet</option>
-        <option value="https://rinkeby.infura.io/v3/${opts.infuraApiKey};4">Ethereum Rinkeby</option>
-        <option value="https://bsc-dataseed.binance.org/;56">Binance Mainnet</option>
-        <option value="https://data-seed-prebsc-1-s1.binance.org:8545/;97">Binance Testnet</option>
-        <option value="https://rpc-mainnet.maticvigil.com/;187">Polygon Mainnet</option>
-        <option value="https://rpc-mumbai.matic.today;80001">Polygon Mumbai</option>
+        ${rpcOptionsTemplate}
     </select>
 </div>
 </div>`
@@ -274,14 +310,14 @@ let WalletConnectCfg = {
 
         let result = await prompt.spawn();
 
-        let [rpcUrl, chainId] = result.networkString.split(";");
+        let [_, chainId] = result.networkString.split(";");
+
+        let RPCMapping = getRPCs(opts.infuraApiKey)
+            .reduce((obj, rpc) => (obj[rpc.chainId] = rpc.rpcUrl, obj), {});
 
         // Create WalletConnect Provider
-        // Restricting the RPC mapping to just the entry that the user has choosen, this is useful for those wallets that don't let the user change the network
         let provider = new pkg({
-            rpc: {
-                [chainId]: rpcUrl
-            },
+            rpc: { ...RPCMapping },
             chainId
         });
         
