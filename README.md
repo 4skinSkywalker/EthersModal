@@ -197,21 +197,21 @@ It's not a promise so you don't need to await it.
 Here comes the very interesting part of this library: the connection object.
 You may have noticed that await-ing .connect() from above examples returns this weird looking object, let's analyze it:
 
-1. ethers: Module { [[ ethers library itself ]] },
+1. ethers: `Module { [[ ethers library itself ]] }`,
 
-2. signer$: ObsCacher { value: [[ ethers signer ]] },
+2. signer$: `ObsCacher { value: [[ ethers signer ]] }`,
 
-3. provider$: ObsCacher { value: [ ethers provider ] },
+3. provider$: `ObsCacher { value: [ ethers provider ] }`,
 
-4. baseTokenBalance$: ObsCacher { value: '26.98899094' },
+4. baseTokenBalance$: `ObsCacher { value: '26.98899094' }`,
 
-5. chainId$: ObsCacher { value: 97 },
+5. chainId$: `ObsCacher { value: 97 }`,
 
-6. selectedAccount$: ObsCacher { value: '0xeB3**********************************f99' },
+6. selectedAccount$: `ObsCacher { value: '0xeB3**********************************f99' }`,
 
-7. isConnected$: ObsCacher { value: true },
+7. isConnected$: `ObsCacher { value: true }`,
 
-8. networkChangeNotification$: ObsEmitter {}
+8. networkChangeNotification$: `ObsEmitter {}`
 
 The above properties marked with `$` are observables (either ObsCacher or ObsEmitter). In short, an observable is like a variable but you can subscribe to it, so that when its values changes you get notified. Pretty handy, isn't it?
 
