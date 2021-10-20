@@ -1,6 +1,6 @@
 {
   "name": "ethersmodal",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "EthersModal is an opinionated library to help developers add support for multiple wallets in their apps.",
   "main": "./src/index.js",
   "dependencies": {
