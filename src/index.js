@@ -2,12 +2,9 @@ let { ethers } = require("ethers");
 let { ObsCacher, ObsEmitter } = require("bada55asyncutils");
 let providers = require("./providers");
 let SmartInterval = require("smartinterval");
+let { isNotNullOrUndefined } = require("./utils");
 
 let LS_KEY = "ETHERS_MODAL_CACHED_PROVIDER";
-
-let isNotNullOrUndefined = (value) => {
-  return ![null, undefined].includes(value);
-}
 
 function EthersModal(opts = {}) {
 

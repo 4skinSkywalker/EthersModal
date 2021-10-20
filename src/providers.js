@@ -1,6 +1,7 @@
 let { ethers } = require("ethers");
 let SmartPrompt = require("smartprompt");
 let detectEthereumProvider = require("@metamask/detect-provider");
+let { isMobile } = require("./utils");
 
 let getRPCs = (infuraKey) => ([
     {
@@ -473,7 +474,7 @@ let PolkadotCfg = {
     }
 };
 
-module.exports = {
+let exportObj = {
     dictionary: {
         InjectedProviderCfg,
         MetaMaskCfg,
@@ -484,8 +485,13 @@ module.exports = {
         PolkadotCfg
     },
     array: [
-        InjectedProviderCfg,
         MetaMaskCfg,
         BinanceCfg
     ]
 };
+
+if (isMobile()) {
+    exportObj.array.unshift(InjectedProviderCfg);
+}
+
+module.exports = exportObj;
