@@ -2,11 +2,6 @@
 
 EthersModal is an opinionated library to help developers add support for multiple wallets in their apps.
 
-## Webpack
-
-This project is built with the help of webpack.
-If you make any change in the src/ folder make sure to then run `npm run build` to compile a new `main.js` inside the dist/ folder.
-
 ## What do you mean with opinionated?
 
 By opinionated I mean that it provides a structured approach of handling the connection to a set of given wallets.
@@ -27,9 +22,27 @@ Why did I use "$" as suffix? Because it's a convention to mark fields as observa
 This library is not intended to be a one-size-fits-all solution, but it covers 99% of the stuff I've done in the past.
 Web3Modal is more flexible, but it doesn't provide all that this library does.
 
-## Try it
+## Webpack
 
-Head over to [https://4skinskywalker.github.io/EthersModal/](https://4skinskywalker.github.io/EthersModal/) and try with MetaMask or Binance Chain wallet.
+This project is built with the help of webpack.
+If you make any change in the src/ folder make sure to then run `npm run build` to compile a new `main.js` inside the dist/ folder.
+
+# Table of Contents
+1. [Demo link](#demo-link)
+2. [Getting started](#getting-started)
+3. [Configure all supported wallets](#configure-all-supported-wallets)
+4. [Connect](#connect)
+5. [Check connection](#check-connection)
+6. [Disconnect](#disconnect)
+7. [Connection object](#connection-object)
+8. [ObsCacher and ObsEmitter](#obscacher-and-obsemitter)
+9. [Add a new provider](#add-a-new-provider)
+10. [Customization](#customization)
+11. [Contributing](#contributing)
+
+## Demo link
+
+Head over to [https://4skinskywalker.github.io/EthersModal/](https://4skinskywalker.github.io/EthersModal/) and try with few different wallets.
 
 ## Getting started
 
@@ -107,7 +120,7 @@ let em = new EthersModal();
 )();
 ```
 
-## Configuration of all supported wallets
+## Configure all supported wallets
 
 The following example show how to create an EthersModal instance with all the wallets that are available:
 
@@ -198,40 +211,28 @@ Here comes the very interesting part of this library: the connection object.
 You may have noticed that await-ing .connect() from above examples returns this weird looking object, let's analyze it:
 
 1. ethers: `Module { [[ ethers library itself ]] }`,
-
 2. signer$: `ObsCacher { value: [[ ethers signer ]] }`,
-
 3. provider$: `ObsCacher { value: [ ethers provider ] }`,
-
-4. baseTokenBalance$: `ObsCacher { value: '26.98899094' }`,
-
-5. chainId$: `ObsCacher { value: 97 }`,
-
-6. selectedAccount$: `ObsCacher { value: '0xeB3**********************************f99' }`,
-
+4. chainId$: `ObsCacher { value: 97 }`,
+5. selectedAccount$: `ObsCacher { value: '0xeB3**********************************f99' }`,
+6. baseTokenBalance$: `ObsCacher { value: '26.98899094' }`,
 7. isConnected$: `ObsCacher { value: true }`,
-
 8. networkChangeNotification$: `ObsEmitter {}`
 
 The above properties marked with `$` are observables (either ObsCacher or ObsEmitter). In short, an observable is like a variable but you can subscribe to it, so that when its values changes you get notified. Pretty handy, isn't it?
 
 Let's give some more details on each and every property:
 
-1. `ethers` contains the ethers library itself;
+1. `ethers` - The ethers library itself;
+2. `provider$` - Contains an instance of an ethers provider;
+3. `signer$` - Contains an ethers compatible signer for your connected account;
+4. `chainId$` - Contains the chain id of the network you are connected to;
+5. `selectedAccount$` - Contains the currently selected account address (or the first in case multiple accounts are connected);
+6. `baseTokenBalance$` - Contains the base token balance of the user in ether;
+7. `isConnected$` - Contains a boolean with the state of the connection;
+8. `networkChangeNotification$` - Signals when chainId or selectedAccount have changed.
 
-2. `provider$` contains an `ethers.provider` instance of the wallet you are using;
-
-3. `signer$` contains a ethers compatible signer for your connected account;
-
-4. `chainId$` contains the chain id of the network you are connected to;
-
-5. `selectedAccount$` contains your currently selected account address (or the first in case multiple accounts are connected);
-
-6. `isConnected$` contains a boolean that tells you if you are connected or not, it's derived from all the properties above;
-
-7. `networkChangeNotification$` signals when chainId or selectedAccount have changed. It passes an object of type { topic: "chainId" | "selectedAccount", value: any } to the consumer of the event.
-
-## ObsCacher and ObsEmitter data types
+## ObsCacher and ObsEmitter
 
 ObsEmitter is similar to an EventEmitter.
 
@@ -250,7 +251,7 @@ One thing to be aware of is that "unsubscribe" is not a method of the object its
 
 More about these two data types can be found in the article https://freddycorly.medium.com/my-light-js-implementation-of-rxjs-subjects-1a747dcf1839.
 
-## How to add a new provider
+## Add a new provider
 
 To add a provider you just copy-paste the code below and fill in the blanks.
 Take a look at the provider.js file in the source code to get an idea, there you can find MetaMask, Binance Wallet, Coinbase Wallet etc...
@@ -279,7 +280,7 @@ let DemoWallet = {
 
 The connection property is an asynchronous function that should return ethers provider and signer, a function `getNetwork` which has to return an object of type `{ chainId: string | number }` and a function `getAccounts` that has to return either an array of addresses or a single standalone address.
 
-## Personalization
+## Customization
 
 Plenty of personalization can be integrated in this library. If you have a good idea just submit it as a feature request in the issue on GitHub.
 

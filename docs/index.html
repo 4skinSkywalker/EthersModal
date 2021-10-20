@@ -169,22 +169,48 @@
             </label>
         </div>
     </div>
+
+    <!-- Fortmatic, WalletConnect -->
+    <script src="https://cdn.jsdelivr.net/npm/fortmatic/dist/fortmatic.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.6.6/dist/umd/index.min.js"></script>
+    <script>
+        WalletConnectProvider = WalletConnectProvider.default;
+    </script>
+
     <script src="./main.js"></script>
     <script>
+
+        let myWallets = EthersModal.providers.array;
+
+        // Setup of Fortmatic configurations
+        let fortmaticCfg = EthersModal.providers.dictionary.FortmaticCfg;
+        fortmaticCfg.options.fortmaticApiKey = "pk_test_ADCE42E053643A95";
+        fortmaticCfg.options.infuraApiKey = "b5b51030cf3e451bb523a3f2ca10e3ff";
+        fortmaticCfg.package = Fortmatic;
+        myWallets.push(fortmaticCfg);
+
+        // Setup of WalletConnect configurations
+        let walletConnectCfg = EthersModal.providers.dictionary.WalletConnectCfg;
+        walletConnectCfg.options.infuraApiKey = "b5b51030cf3e451bb523a3f2ca10e3ff";
+        walletConnectCfg.package = WalletConnectProvider;
+        myWallets.push(walletConnectCfg);
+
+        // Make an instance of EthersModal with providerOpts in the specification
+        let em = new EthersModal({
+            providerOpts: myWallets
+        });
+
         let connectBtn = document.querySelector(".connect");
         let chainDiv = document.querySelector(".chain-id");
         let accountDiv = document.querySelector(".selected-account");
         let balanceDiv = document.querySelector(".base-token-balance");
         let listenNetworkChangeCheck = document.querySelector("#listenNetworkChangeCheck");
-        
-        let em = new EthersModal();
-        let conn = em.connection;
 
         let networkChangeNotificationSubscription;
         listenNetworkChangeCheck.addEventListener("input", (evt) => {
             let checked = evt.target.checked;
             if (checked) {
-                networkChangeNotificationSubscription = conn.networkChangeNotification$
+                networkChangeNotificationSubscription = em.connection.networkChangeNotification$
                     .subscribe(({ topic, value }) =>
                         alert(`${topic} has changed, its new value is ${value}`)
                     );
@@ -203,18 +229,18 @@
         };
 
         let setupUI = () => {
-            conn.chainId$.subscribe(newChainId => {
+            em.connection.chainId$.subscribe(newChainId => {
                 chainDiv.innerText = (newChainId) ? newChainId : "-";
             });
-            conn.selectedAccount$.subscribe(newSelectedAccount => {
+            em.connection.selectedAccount$.subscribe(newSelectedAccount => {
                 accountDiv.innerText = (newSelectedAccount) ? newSelectedAccount : "-";
             });
-            conn.baseTokenBalance$.subscribe(newBaseTokenBalance => {
+            em.connection.baseTokenBalance$.subscribe(newBaseTokenBalance => {
                 balanceDiv.innerText = (newBaseTokenBalance) ? newBaseTokenBalance : "-";
             });
 
             // If EthersModal is connected, then it lights up with RGB backlight animation
-            conn.isConnected$.subscribe(isConnected => {
+            em.connection.isConnected$.subscribe(isConnected => {
                 if (isConnected) {
                     dividerDiv.classList.add("rgb-backlight");
                     fieldDividerDivs.forEach(divider =>
@@ -237,7 +263,12 @@
         }
 
         let connect = async () => {
-            await em.connect();
+            try {
+                await em.connect();
+            }
+            catch (err) {
+                alert(err);
+            }
 
             setupUI();
 
