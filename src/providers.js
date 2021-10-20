@@ -55,6 +55,43 @@ let getRPCs = (infuraKey) => ([
 //     }
 // };
 
+// An injected provider is any provider put by an app/browser inside either ethereum or web3 property of the window object. It's usually a provider injected by in-wallet browser on mobile
+let InjectedProviderCfg = {
+    display: {
+        logo: "../img/in-wallet.svg",
+        name: "In-wallet browser",
+        description: "Connect with an in-wallet browser"
+    },
+    options: null,
+    package: null,
+    connector: async () => {
+        let provider = null;
+        if (typeof window.ethereum !== 'undefined') {
+            provider = window.ethereum;
+            try {
+                await provider.request({ method: 'eth_requestAccounts' })
+            } catch (error) {
+                throw new Error("User Rejected");
+            }
+        } else if (window.web3) {
+            provider = window.web3.currentProvider;
+        } else {
+            throw new Error("No Provider found");
+        }
+
+        // Get ethers provider and signer
+        let ethersProvider = new ethers.providers.Web3Provider(provider, "any");
+        let signer = ethersProvider.getSigner();
+
+        return {
+            provider: ethersProvider,
+            signer,
+            getNetwork: ethersProvider.getNetwork.bind(ethersProvider),
+            getAccounts: ethersProvider.listAccounts.bind(ethersProvider)
+        };
+    }
+};
+
 let MetaMaskCfg = {
     display: {
         logo: "https://raw.githubusercontent.com/4skinSkywalker/EthersModal/main/img/metamask.svg",
@@ -438,6 +475,7 @@ let PolkadotCfg = {
 
 module.exports = {
     dictionary: {
+        InjectedProviderCfg,
         MetaMaskCfg,
         BinanceCfg,
         CoinbaseCfg,
@@ -446,6 +484,7 @@ module.exports = {
         PolkadotCfg
     },
     array: [
+        InjectedProviderCfg,
         MetaMaskCfg,
         BinanceCfg
     ]

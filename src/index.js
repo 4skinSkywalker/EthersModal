@@ -409,7 +409,7 @@ EthersModal.prototype.getHTMLBoilerplate = function () {
         color: #aaa;
       }
       
-      @media (max-width: 400px) {
+      @media (max-width: 414px) {
         .em${this.uuid} {
           grid-template-columns: 1fr;
         }
@@ -420,10 +420,6 @@ EthersModal.prototype.getHTMLBoilerplate = function () {
         
         .em${this.uuid}-wallet:not(:first-child) {
           border-top: 2px solid #eee!important;
-        }
-        
-        .em${this.uuid}-wallet img {
-          height: 32px;
         }
       }
     </style>
