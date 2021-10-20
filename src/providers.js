@@ -58,7 +58,7 @@ let getRPCs = (infuraKey) => ([
 // An injected provider is any provider put by an app/browser inside either ethereum or web3 property of the window object. It's usually a provider injected by in-wallet browser on mobile
 let InjectedProviderCfg = {
     display: {
-        logo: "../img/in-wallet.svg",
+        logo: "https://raw.githubusercontent.com/4skinSkywalker/EthersModal/main/img/in-wallet.svg",
         name: "In-wallet browser",
         description: "Connect with an in-wallet browser"
     },
