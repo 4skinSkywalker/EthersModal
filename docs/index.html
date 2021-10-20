@@ -66,6 +66,7 @@
             max-width: 320px;
             padding: 2rem;
             border-radius: 1rem;
+            color: var(--ground-color);
             background-color: var(--figure-color);
             box-shadow: 0 12px 24px #000a;
         }
@@ -162,6 +163,10 @@
                 <div>Base token balance</div>
                 <div class="base-token-balance">-</div>
             </div>
+            <label for="listenNetworkChangeCheck">
+                <input type="checkbox" id="listenNetworkChangeCheck">
+                Listen for network changes
+            </label>
         </div>
     </div>
     <script src="./main.js"></script>
@@ -170,40 +175,46 @@
         let chainDiv = document.querySelector(".chain-id");
         let accountDiv = document.querySelector(".selected-account");
         let balanceDiv = document.querySelector(".base-token-balance");
-
-        // Some randomness in the RGB backlight animation
-        let dividerDiv = document.querySelector(".divider");
-        let fieldDividerDivs = [...document.querySelectorAll(".field")];
-        let fieldDivs = [...document.querySelectorAll(".field [class]")];
-        [dividerDiv, ...fieldDividerDivs, ...fieldDivs]
-            .forEach(el => {
-                el.style.animationDelay = (Math.random() * 3).toFixed(3) + "s";
-                el.style.animationDuration = (8 + (Math.random() * 8)).toFixed(3) + "s";
-                el.style.animationDirection = (Math.random() > 0.5) ? "alternate" : "alternate-reverse";
-            });
+        let listenNetworkChangeCheck = document.querySelector("#listenNetworkChangeCheck");
         
         let em = new EthersModal();
+        let conn = em.connection;
 
-        let disconnect = function () {
+        let networkChangeNotificationSubscription;
+        listenNetworkChangeCheck.addEventListener("input", (evt) => {
+            let checked = evt.target.checked;
+            if (checked) {
+                networkChangeNotificationSubscription = conn.networkChangeNotification$
+                    .subscribe(({ topic, value }) =>
+                        alert(`${topic} has changed, its new value is ${value}`)
+                    );
+            }
+            else {
+                networkChangeNotificationSubscription.unsubscribe();
+            }
+        });
+
+        let disconnect = () => {
             em.disconnect();
+
             connectBtn.innerText = "Connect";
             connectBtn.removeEventListener("click", disconnect);
             connectBtn.addEventListener("click", connect);
         };
 
-        let setupUI = function ({ chainId$, selectedAccount$, baseTokenBalance$, isConnected$ }) {
-            chainId$.subscribe(newChainId => {
+        let setupUI = () => {
+            conn.chainId$.subscribe(newChainId => {
                 chainDiv.innerText = (newChainId) ? newChainId : "-";
             });
-            selectedAccount$.subscribe(newSelectedAccount => {
+            conn.selectedAccount$.subscribe(newSelectedAccount => {
                 accountDiv.innerText = (newSelectedAccount) ? newSelectedAccount : "-";
             });
-            baseTokenBalance$.subscribe(newBaseTokenBalance => {
+            conn.baseTokenBalance$.subscribe(newBaseTokenBalance => {
                 balanceDiv.innerText = (newBaseTokenBalance) ? newBaseTokenBalance : "-";
             });
 
             // If EthersModal is connected, then it lights up with RGB backlight animation
-            isConnected$.subscribe(isConnected => {
+            conn.isConnected$.subscribe(isConnected => {
                 if (isConnected) {
                     dividerDiv.classList.add("rgb-backlight");
                     fieldDividerDivs.forEach(divider =>
@@ -225,10 +236,10 @@
             })
         }
 
-        let connect = async function () {
-            let connection = await em.connect();
+        let connect = async () => {
+            await em.connect();
 
-            setupUI(connection);
+            setupUI();
 
             connectBtn.innerText = "Disconnect";
             connectBtn.removeEventListener("click", connect);
@@ -236,6 +247,17 @@
         };
 
         connectBtn.addEventListener("click", connect);
+
+        // Some randomness in the RGB backlight animation
+        let dividerDiv = document.querySelector(".divider");
+        let fieldDividerDivs = [...document.querySelectorAll(".field")];
+        let fieldDivs = [...document.querySelectorAll(".field [class]")];
+        [dividerDiv, ...fieldDividerDivs, ...fieldDivs]
+            .forEach(el => {
+                el.style.animationDelay = (Math.random() * 3).toFixed(3) + "s";
+                el.style.animationDuration = (8 + (Math.random() * 8)).toFixed(3) + "s";
+                el.style.animationDirection = (Math.random() > 0.5) ? "alternate" : "alternate-reverse";
+            });
     </script>
 </body>
 

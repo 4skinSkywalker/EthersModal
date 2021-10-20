@@ -11,97 +11,105 @@ If you make any change in the src/ folder make sure to then run `npm run build` 
 
 By opinionated I mean that it provides a structured approach of handling the connection to a set of given wallets.
 When calling the .connect() method you will receive an object with essential properties that covers 99% of the usecases:
-- Ethers itself
-- A provider
-- A signer
-- The chain id
-- The selected account (the first one if multiple are present)
-- Base token balance (in ether)
+- ethers (the library itself)
+- provider$
+- signer$
+- chainId$
+- selectedAccount$ (the first one if multiple are present)
+- baseTokenBalance$ (in ether)
+- isConnected$
+- networkChangeNotification$ (emits when selectedAccount or chainId emit)
 
-I choose this approach because it makes way way easier for me to implement stuff.
-Obviously this is not a one-size-fits-all kind of solution, but it covers 99% of the stuff I've done in the past.
+All the above properties are observables (either ObsCacher or ObsEmitter) which are kinda like variables that you can listen to for changes (see below to know more).
+This is especially useful if you want to react with your code to changes in all the above properties.
+Why did I use "$" as suffix? Because it's a convention to mark fields as observables, it's completely arbitrary.
+
+This library is not intended to be a one-size-fits-all solution, but it covers 99% of the stuff I've done in the past.
 Web3Modal is more flexible, but it doesn't provide all that this library does.
-
-Another thing that makes this very opinionated is the fact that Provider, Signer, Chain ID and Selected Account that get returned by a connection call are of type ObsCached (see below to know more) which is kind like a variable that you can listen to for changes.
-This is especially useful if you want to react with your code to changes in all four above properties.
 
 ## Try it
 
-Head over to [https://4skinskywalker.github.io/EthersModal/](https://4skinskywalker.github.io/EthersModal/) and try with your MetaMask or Binance Chain wallets.
+Head over to [https://4skinskywalker.github.io/EthersModal/](https://4skinskywalker.github.io/EthersModal/) and try with MetaMask or Binance Chain wallet.
 
 ## Getting started
 
-The easiest example you can try is using the default settings:
+The easiest example you can try is with default settings:
 
 ```js
-// Make an instance of EthersModal (by default just MetaMask and Binance Chain Wallet)
+// Make an instance of EthersModal without any specification (by default just MetaMask and Binance Chain Wallet will be included)
 let em = new EthersModal();
 
 (async () => {
 
-    // await a call to the .connect() method to get a connection object
-    let connection = await em.connect();
+    // Await a call to the .connect() method to get a connection object
+    let conn = await em.connect();
 
-    
-    // You can get the current provider
-    connection.provider$.getValue();
 
-    // You can listen for changes to the provider
-    let providerSubscription = connection.provider$
+    // 1. Get current ethers provider
+    // 2. Listen for changes of ethers provider
+    // 3. Unsubscribe from 2.
+    conn.provider$.getValue();
+    let providerSub = conn.provider$
         .subscribe(newProvider => { ... });
-
-    // You can stop listening for changes to the provider
-    providerSubscription.unsubscribe();
+    providerSub.unsubscribe();
 
 
-    // You can get the current signer
-    connection.signer$.getValue();
-
-    // You can listen for changes to the signer
-    let signerSubscription = connection.signer$
+    // 1. Get current ethers signer
+    // 2. Listen for changes of ethers signer
+    // 3. Unsubscribe from 2.
+    conn.signer$.getValue();
+    let signerSub = conn.signer$
         .subscribe(newSigner => { ... });
-
-    // You can stop listening for changes to the signer
-    signerSubscription.unsubscribe();
+    signerSub.unsubscribe();
 
 
-    // You can get the current chain id
-    connection.chainId$.getValue();
-
-    // You can listen for changes to the chain id
-    let chainIdSubscription = connection.chainId$
+    // 1. Get current chain id
+    // 2. Listen for changes of chain id
+    // 3. Unsubscribe from 2.
+    conn.chainId$.getValue();
+    let chainIdSub = conn.chainId$
         .subscribe(newChainId => { ... });
-
-    // You can stop listening for changes to the chain id
-    chainIdSubscription.unsubscribe();
+    chainIdSub.unsubscribe();
 
 
-    // You can get the current selected account
-    connection.selectedAccount$.getValue();
-
-    // You can listen for changes to the selected account
-    let selectedAccountSubscription = connection.selectedAccount$
+    // 1. Get current selected account
+    // 2. Listen for changes of selected account
+    // 3. Unsubscribe from 2.
+    conn.selectedAccount$.getValue();
+    let selectedAccountSub = conn.selectedAccount$
         .subscribe(newSelectedAccount => { ... });
-
-    // You can stop listening for changes to the selected account
-    selectedAccountSubscription.unsubscribe();
+    selectedAccountSub.unsubscribe();
 
 
-    // You can get the base token balance (in ether)
-    connection.baseTokenBalance$.getValue();
-
-    // You can listen for changes to the selected account
-    let baseTokenBalanceSubscription = connection.baseTokenBalance$
+    // 1. Get current base token balance (in ether)
+    // 2. Listen for changes of base token balance (in ether)
+    // 3. Unsubscribe from 2.
+    conn.baseTokenBalance$.getValue();
+    let baseTokenBalanceSub = conn.baseTokenBalance$
         .subscribe(newBaseTokenBalance => { ... });
+    baseTokenBalanceSub.unsubscribe();
 
-    // You can stop listening for changes to the selected account
-    baseTokenBalanceSubscription.unsubscribe();
+
+    // 1. Get current boolean state of the connection
+    // 2. Listen for changes of boolean state of the connection
+    // 3. Unsubscribe from 2.
+    conn.isConnected$.getValue();
+    let isConnectedSub = conn.isConnected$
+        .subscribe(newIsConnected => { ... });
+    isConnectedSub.unsubscribe();
+
+
+    // 1. Listen for changes of chain id or selected account
+    // 2. Unsubscribe from 1.
+    let networkChangeNotificationSub = conn.networkChangeNotification$
+        .subscribe(({ topic, value }) => { ... });
+    networkChangeNotificationSub.unsubscribe();
 )();
 ```
 
 ## Configuration of all supported wallets
 
-The following example show how to create an EthersModal instance with all the wallets available:
+The following example show how to create an EthersModal instance with all the wallets that are available:
 
 ```js
 // For Coinbase Wallet
@@ -150,7 +158,7 @@ polkadotCfg.package = [
 ];
 myWallets.push(polkadotCfg);
 
-// Make an instance of EthersModal
+// Make an instance of EthersModal with providerOpts in the specification
 let em = new EthersModal({
     providerOpts: myWallets
 });
@@ -168,7 +176,7 @@ let em = new EthersModal({
 
 (async () => {
 
-    // await a call to the .connect() method
+    // Await a call to the .connect() method
     let connection = await em.connect();
     console.log(connection);
 
@@ -177,7 +185,7 @@ let em = new EthersModal({
 
 ## Check connection
 
-You can check if EthersModal is connected either manually, or by listening (or just getting its value) `isConnected$`, it checks if the connection object has all other fields valorized and notifies listeners when any property in the connection object is emitting a new value.
+You can check if EthersModal is connected either manually by checking the presence of chain id and selected account, or by listening (or just getting its value) `isConnected$`.
 
 ## Disconnect
 
@@ -188,35 +196,59 @@ It's not a promise so you don't need to await it.
 
 Here comes the very interesting part of this library: the connection object.
 You may have noticed that await-ing .connect() from above examples returns this weird looking object, let's analyze it:
-- ethers: Module {…}
-- provider$: ObsCacher {value: u, consumers: {…}}
-- signer$: ObsCacher {value: JsonRpcSigner, consumers: {…}}
-- chainId$: ObsCacher {value: 4, consumers: {…}}
-- selectedAccount$: ObsCacher {value: '0x168**********************************d77', consumers: {…}}
 
-The above properties marked with `$` are of type ObsCacher, an ObsCacher is like a variable but you can subscribe to it, so that when it changes you get notified. 
+1. ethers: Module { [[ ethers library itself ]] },
 
-The first property above (`ethers`) contains the ethers library itself, it's pretty handy to have it there, no?
+2. signer$: ObsCacher { value: [[ ethers signer ]] },
 
-The second property called `provider$` contains an `ethers.provider` instance of the wallet you are using.
+3. provider$: ObsCacher { value: [ ethers provider ] },
 
-The third property called `signer$` contains a ethers compatible signer for your connected account.
+4. baseTokenBalance$: ObsCacher { value: '26.98899094' },
 
-The fourth property is `chainId$` and contains the chain id of the network you are connected to.
+5. chainId$: ObsCacher { value: 97 },
 
-The fifth and last property is `selectedAccount$` and contains your currently selected account address (or the first in case multiple accounts are connected).
+6. selectedAccount$: ObsCacher { value: '0xeB3**********************************f99' },
 
-## ObsCacher data type
+7. isConnected$: ObsCacher { value: true },
 
-More about this can be found in the article https://freddycorly.medium.com/my-light-js-implementation-of-rxjs-subjects-1a747dcf1839.
-This data type from https://www.npmjs.com/package/bada55asyncutils is similar to an EventEmitter that keeps a registry of multiple listeners. When an event happens, e.g. new value arrives, it notifies those listeners. Not only that, it also acts as a cache that subscribers can read the latest value when they need it.
+8. networkChangeNotification$: ObsEmitter {}
 
-The standard API is pretty simple:
+The above properties marked with `$` are observables (either ObsCacher or ObsEmitter). In short, an observable is like a variable but you can subscribe to it, so that when its values changes you get notified. Pretty handy, isn't it?
+
+Let's give some more details on each and every property:
+
+1. `ethers` contains the ethers library itself;
+
+2. `provider$` contains an `ethers.provider` instance of the wallet you are using;
+
+3. `signer$` contains a ethers compatible signer for your connected account;
+
+4. `chainId$` contains the chain id of the network you are connected to;
+
+5. `selectedAccount$` contains your currently selected account address (or the first in case multiple accounts are connected);
+
+6. `isConnected$` contains a boolean that tells you if you are connected or not, it's derived from all the properties above;
+
+7. `networkChangeNotification$` signals when chainId or selectedAccount have changed. It passes an object of type { topic: "chainId" | "selectedAccount", value: any } to the consumer of the event.
+
+## ObsCacher and ObsEmitter data types
+
+ObsEmitter is similar to an EventEmitter.
+
+ObsEmitter API:
+- .subscribe(fn) is used to add new listeners
+- unsubscribe is called to remove a listener
+
+ObsCacher acts as a cache that consumers can read the latest value when they need it.
+
+ObsCacher API:
 - .getValue() is used to get the last value
 - .subscribe(fn) is used to add new listeners
 - unsubscribe is called to remove a listener
 
-One think to be aware of is that "unsubscribe" is not a method of the object itself, it’s the return value (of type function) from the .subscribe() method call.
+One thing to be aware of is that "unsubscribe" is not a method of the object itself, it’s the return value (of type function) from the .subscribe() method call.
+
+More about these two data types can be found in the article https://freddycorly.medium.com/my-light-js-implementation-of-rxjs-subjects-1a747dcf1839.
 
 ## How to add a new provider
 
@@ -244,6 +276,8 @@ let DemoWallet = {
     }
 };
 ```
+
+The connection property is an asynchronous function that should return ethers provider and signer, a function `getNetwork` which has to return an object of type `{ chainId: string | number }` and a function `getAccounts` that has to return either an array of addresses or a single standalone address.
 
 ## Personalization
 

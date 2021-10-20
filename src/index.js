@@ -1,5 +1,5 @@
 let { ethers } = require("ethers");
-let { ObsCacher } = require("bada55asyncutils");
+let { ObsCacher, ObsEmitter } = require("bada55asyncutils");
 let providers = require("./providers");
 let SmartInterval = require("smartinterval");
 
@@ -18,7 +18,8 @@ function EthersModal(opts = {}) {
     chainId$: new ObsCacher(),
     selectedAccount$: new ObsCacher(),
     baseTokenBalance$: new ObsCacher(),
-    isConnected$: new ObsCacher(false)
+    isConnected$: new ObsCacher(false),
+    networkChangeNotification$: new ObsEmitter()
   };
 
   this.providerOpts = opts.providerOpts || providers.array;
@@ -31,22 +32,40 @@ function EthersModal(opts = {}) {
 
   this.updateVariablesInterval;
 
-  // Make isConnected subordinate to the existence of all other fields
-  let obsToMonitor = [
+  let isConnectedMonitor = [
     this.connection.provider$,
     this.connection.signer$,
     this.connection.chainId$,
     this.connection.selectedAccount$,
     this.connection.baseTokenBalance$
   ];
-  obsToMonitor.forEach(obs =>
-    obs.subscribe(() => {
-      let isConnected = obsToMonitor.every(obs =>
-        isNotNullOrUndefined(obs.getValue())
-      );
-      this.connection.isConnected$.next(isConnected);
-    })
-  );
+  isConnectedMonitor
+    .forEach(obs =>
+      obs.subscribe(() => {
+        let isConnected = isConnectedMonitor.every(obs =>
+          isNotNullOrUndefined(obs.getValue())
+        );
+
+        // Update its value only when has changed
+        if (this.connection.isConnected$.getValue() !== isConnected) {
+          this.connection.isConnected$.next(isConnected);
+        }
+      })
+    );
+
+  let networkChangeNotificationMonitor = [
+    this.connection.chainId$,
+    this.connection.selectedAccount$
+  ];
+  networkChangeNotificationMonitor
+    .forEach((obs, i) =>
+      obs.subscribe((value) => {
+        this.connection.networkChangeNotification$.next({
+          topic: (i === 0) ? "chainId" : "selectedAccount",
+          value 
+        });
+      })
+    );
 
   // Everything is "encapsulate" by this UUID
   this.uuid = Math.random().toString(36).slice(2);
