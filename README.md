@@ -278,7 +278,7 @@ let DemoWallet = {
 };
 ```
 
-The connection property is an asynchronous function that should return ethers provider and signer, a function `getNetwork` which has to return an object of type `{ chainId: string | number }` and a function `getAccounts` that has to return either an array of addresses or a single standalone address.
+The connector methods is asynchronous and have to return an ethers provider and signer, a function `getNetwork` which has to return an object of type `{ chainId: string | number }` and a function `getAccounts` that has to return an array of addresses or a single standalone address.
 
 ## Customization
 
@@ -292,7 +292,7 @@ let em = new EthersModal({
     cacheProvider: true, // Optional, default false
     width: "80vw", // Optional, default 90vw
     maxWidth: "640px", // Optional, default 480px
-    syncRate: 450 // Optional, default 1000
+    syncRate: 450 // Optional, default 1000 ms
 });
 ```
 

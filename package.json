@@ -1,8 +1,11 @@
 {
   "name": "ethersmodal",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "EthersModal is an opinionated library to help developers add support for multiple wallets in their apps.",
   "main": "./src/index.js",
+  "scripts": {
+    "build": "webpack"
+  },
   "dependencies": {
     "@metamask/detect-provider": "^1.2.0",
     "bada55asyncutils": "^2.0.3",
@@ -23,8 +26,5 @@
   "bugs": {
     "url": "https://github.com/4skinSkywalker/EthersModal/issues"
   },
-  "homepage": "https://github.com/4skinSkywalker/EthersModal#readme",
-  "scripts": {
-    "build": "webpack"
-  }
+  "homepage": "https://github.com/4skinSkywalker/EthersModal#readme"
 }
