@@ -1,6 +1,6 @@
 {
   "name": "ethersmodal",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "description": "EthersModal is an opinionated library to help developers add support for multiple wallets in their apps.",
   "main": "./src/index.js",
   "scripts": {
@@ -21,6 +21,15 @@
     "type": "git",
     "url": "git+https://github.com/4skinSkywalker/EthersModal.git"
   },
+  "keywords": [
+    "ethers",
+    "crypto",
+    "ethereum",
+    "ethersmodal",
+    "metamask",
+    "walletconnect",
+    "fortmatic"
+  ],
   "author": "Fredo Corleone",
   "license": "ISC",
   "bugs": {
